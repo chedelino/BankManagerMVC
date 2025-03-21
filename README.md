@@ -23,22 +23,22 @@ The application provides dedicated interfaces for Bank Agents, Client Advisors, 
 ## 📂 Project Structure
 
 /banking-management-system
-│── 📜 a-propos.html        <!-- # About page -->
-│── 👨‍💻 agent.php           # Employee management  
-│── 🌍 banque-en-ligne.html # Online banking page  
-│── 💳 comptes.html         # Account management  
-│── 🔌 connect.php          # Database connection  
-│── 👨‍⚖️ conseiller.php      # Client Advisor dashboard  
-│── 📧 contact.html         # Contact page  
-│── 🏗️ Create_table.sql     # SQL script to create database tables  
-│── 🏦 directeur.php        # Bank Director dashboard  
-│── 🖼️ images/             # Folder containing images for the application  
-│── 🏗️ Insert_table.sql     # SQL script to insert initial data into the database  
-│── 🏠 site.php             # Main entry point of the website  
-│── 🎨 style.css            # Main CSS file for styling  
-│── 🎨 style1.css           # Additional styling file  
-│── 💲 tarifs.html          # Pricing page listing various service fees  
-│── 🏗️ banque.sql           # Full database schema including tables and relationships  
+│── 📜 a-propos.html         # About page
+│── 👨‍💻 agent.php             # Employee management  
+│── 🌍 banque-en-ligne.html  # Online banking page  
+│── 💳 comptes.html          # Account management  
+│── 🔌 connect.php           # Database connection  
+│── 👨‍⚖️ conseiller.php        # Client Advisor dashboard  
+│── 📧 contact.html          # Contact page  
+│── 🏗️ Create_table.sql      # SQL script to create database tables  
+│── 🏦 directeur.php         # Bank Director dashboard  
+│── 🖼️ images/               # Folder containing images for the application  
+│── 🏗️ Insert_table.sql      # SQL script to insert initial data into the database  
+│── 🏠 site.php              # Main entry point of the website  
+│── 🎨 style.css             # Main CSS file for styling  
+│── 🎨 style1.css            # Additional styling file  
+│── 💲 tarifs.html           # Pricing page listing various service fees  
+│── 🏗️ banque.sql            # Full database schema including tables and relationships  
 
 
 ## ⚙️ Technology Stack
