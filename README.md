@@ -27,19 +27,19 @@ The application provides dedicated interfaces for Bank Agents, Client Advisors, 
     │── 📜 a-propos.html           # About page
     │── 👨‍💻 agent.php               # Employee management
     │── 🌍 banque-en-ligne.html    # Online banking page
-    │── 💳 comptes.html # Account management
-    │── 🔌 connect.php # Database connection
-    │── 👨‍⚖️ conseiller.php # Client Advisor dashboard
-    │── 📧 contact.html # Contact page
-    │── 🏗️ Create_table.sql # SQL script to create tables
-    │── 🏦 directeur.php # Bank Director dashboard
-    │── 🖼️ images/ # Folder for storing images
-    │── 🏗️ Insert_table.sql # SQL script to insert data
-    │── 🏠 site.php # Main site entry point
-    │── 🎨 style.css # Main stylesheet
-    │── 🎨 style1.css # Additional styling
-    │── 💲 tarifs.html # Pricing page
-    │── 🏗️ banque.sql # full database schema including tables and relationships
+    │── 💳 comptes.html            # Account management
+    │── 🔌 connect.php             # Database connection
+    │── 👨‍⚖️ conseiller.php          # Client Advisor dashboard
+    │── 📧 contact.html            # Contact page
+    │── 🏗️ Create_table.sql        # SQL script to create tables
+    │── 🏦 directeur.php           # Bank Director dashboard
+    │── 🖼️ images/                 # Folder for storing images
+    │── 🏗️ Insert_table.sql        # SQL script to insert data
+    │── 🏠 site.php                # Main site entry point
+    │── 🎨 style.css               # Main stylesheet
+    │── 🎨 style1.css              # Additional styling
+    │── 💲 tarifs.html             # Pricing page
+    │── 🏗️ banque.sql              # full database schema including tables and relationships
 
 
 
