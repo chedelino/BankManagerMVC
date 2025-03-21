@@ -23,54 +23,24 @@ The application provides dedicated interfaces for Bank Agents, Client Advisors, 
 ## 📂 Project Structure
 
 /banking-management-system
-│
-├── 🏠 site.php                
-│   └── Main entry point of the website
-│
-├── 🔌 connect.php             
-│   └── Database connection
-│
-├── 📜 a-propos.html           
-│   └── About page
-│
-├── 🌍 banque-en-ligne.html    
-│   └── Online banking page
-│
-├── 💳 comptes.html            
-│   └── Account management
-│
-├── 📧 contact.html            
-│   └── Contact page
-│
-├── 💲 tarifs.html             
-│   └── Pricing page listing various service fees
-│
-├── 👨‍💻 agent.php              
-│   └── Employee management
-│
-├── 👨‍⚖️ conseiller.php         
-│   └── Client Advisor dashboard
-│
-├── 🏦 directeur.php           
-│   └── Bank Director dashboard
-│
-├── 🎨 style.css               
-│   └── Main CSS file for styling
-│
-├── 🎨 style1.css              
-│   └── Additional styling file
-│
-├── 🖼️ images/                 
-│   └── Folder containing images for the application
-│
-├── 🏗️ banque.sql              
-│   └── Full database schema including tables and relationships
-│
-├── 🏗️ Create_table.sql        
-│   └── SQL script to create database tables
-│
-└── 🏗️ Insert_table.sql        
-    └── SQL script to insert initial data into the database
+
+    │── 📜 a-propos.html           # About page
+    │── 👨‍💻 agent.php               # Employee management
+    │── 🌍 banque-en-ligne.html    # Online banking page
+    │── 💳 comptes.html # Account management
+    │── 🔌 connect.php # Database connection
+    │── 👨‍⚖️ conseiller.php # Client Advisor dashboard
+    │── 📧 contact.html # Contact page
+    │── 🏗️ Create_table.sql # SQL script to create tables
+    │── 🏦 directeur.php # Bank Director dashboard
+    │── 🖼️ images/ # Folder for storing images
+    │── 🏗️ Insert_table.sql # SQL script to insert data
+    │── 🏠 site.php # Main site entry point
+    │── 🎨 style.css # Main stylesheet
+    │── 🎨 style1.css # Additional styling
+    │── 💲 tarifs.html # Pricing page
+    │── 🏗️ banque.sql # full database schema including tables and relationships
+
 
 
 ## ⚙️ Technology Stack
