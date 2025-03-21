@@ -23,6 +23,7 @@ The application provides dedicated interfaces for Bank Agents, Client Advisors, 
 ## 📂 Project Structure
 
 /banking-management-system
+
 │── 📜 a-propos.html         # About page  
 │── 👨‍💻 agent.php             # Employee management  
 │── 🌍 banque-en-ligne.html  # Online banking page  
