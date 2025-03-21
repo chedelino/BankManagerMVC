@@ -25,6 +25,7 @@ The application provides dedicated interfaces for Bank Agents, Client Advisors, 
 /banking-management-system
 
 │── 📜 a-propos.html         # About page
+
 │── 👨‍💻 agent.php             # Employee management  
 │── 🌍 banque-en-ligne.html  # Online banking page  
 │── 💳 comptes.html          # Account management  
