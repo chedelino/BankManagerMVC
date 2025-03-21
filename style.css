@@ -1,0 +1,384 @@
+body,html{ 
+       width: 100%;
+       height: 100%;
+       margin: 0;
+       padding: 0;
+
+}
+
+body{
+       background-color: #F1F4F9;
+}
+
+footer {
+            text-align: center;
+            background-color: #405f73;
+            color: #fff;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+
+
+   /* Page : Tarifs et simulations */
+
+        div.tarifs {
+            width: 65%;
+            margin-left: 2%;
+            margin-top: 20px; 
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-family: "Comic Sans MS";
+
+        }
+
+
+        .tarif-section {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+
+        .tarif-carte {
+            width: 30%;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .tarif-carte h3 {
+            color: #333;
+        }
+
+        .tarif-card p {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .simulateur {
+            background-color:#09C;
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .simulateur a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #ff5a00;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .simulateur a:hover {
+            background-color: #e84e00;
+        }      
+
+
+       
+       aside{
+              position: absolute;
+              right: 5%;
+              width: 24%;
+              margin-top: 20px;
+              max-width: 328px;
+       }
+
+       article.bulle {
+              background-color: #FFF;
+              border-width: 1px;
+              border-color: #F1F4F9;
+              border-style: solid;
+              color : #414A51;
+              border-radius: 10px;
+              padding-right: 20px;
+              padding-bottom: 20px;
+              margin-bottom: 30px;
+              font-family: "Comic Sans MS";
+              font-size: 15px;
+       }
+
+       h5{
+              color: #ACC0D7;
+              size: 15px;
+              margin-left: 15px;
+              margin-right: 15px;
+       }
+
+       div.image {
+              float: left; 
+              margin: 10px;
+       }
+
+       div.centrale{
+           /* background-color: #FFF;*/
+              margin-left: 8%;
+              padding-top: 3%;
+              position: absolute;
+              top: 50%;left: 28%;
+              transform: translate(-50%, -50%);
+              width: 90%; 
+              padding: 15px;
+              font-size: 18px; 
+       }
+
+
+
+div.contact {
+    margin-left: 2%; 
+    width: 65%; 
+    padding: 20px; 
+    font-size: 16px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); 
+    border-radius: 8px; 
+    margin-top: 20px; 
+    background-color: #FFF;
+    font-family: "Comic Sans MS";
+     font-size: 15px; 
+
+}
+
+
+div.contact ul{
+    all: unset; 
+    
+    list-style-type: disc;
+    list-style-position: outside; 
+    padding-left: 40px; 
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+
+div.contact li {
+    all: unset; 
+    display: list-item;
+    font-size: 16px;
+    color: black; 
+    margin-bottom: 5px; 
+}
+
+
+
+
+
+div.about {
+    width: 60%; 
+    margin-left: 25px; 
+    padding: 15px; 
+    float: left; 
+    box-sizing: border-box; 
+    font-family: "Comic Sans MS";
+}
+
+div.about ul{
+    all: unset; 
+    
+    list-style-type: disc;
+    list-style-position: outside; 
+    padding-left: 40px; 
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+
+div.about li {
+    all: unset; 
+    display: list-item;
+    font-size: 16px;
+    color: black; 
+    margin-bottom: 5px; 
+}
+
+
+
+
+       form{
+              margin: auto;
+              width: 75%;
+       }
+
+       fieldset{
+              background-color: rgb(247,247,247);
+              font-family: "Comic Sans MS";
+              border-radius: 5px;
+              margin-bottom: 10px;
+              border-color: #CCC;
+              border-width: 1px;
+              border-style: solid;
+              box-shadow: 0pt 2px 5px rgba(105, 108, 109, 0.7), 0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;
+
+       }
+
+       legend{
+              padding: 0px 10px;
+              color: #237DAC;
+              border-left: #CC1;
+              border-right: #CC1;
+              border-style: solid;
+              border-width: 1px;
+       }
+
+       label{
+              background-color: #09C;
+              color: #FFF;
+              display: block;
+              width: 39%;
+              float: left;
+              padding-right: 1%;
+              padding-top: 1%;
+              padding-bottom: 1%;
+              margin-left: 4%;
+              text-align: left;
+              letter-spacing: 1px;
+
+
+       }
+
+       label:not(.pas_de_style){
+              border-radius: 3px;
+
+       }
+
+       label:hover{
+              font-weight: bold;
+       }
+
+       input{
+              border-radius: 3px;
+       }
+
+       .pas_de_style{
+              background: none;
+       }
+
+       input{
+              color: #414A51;
+              padding-top: 1%;
+              padding-left: 1%;
+              padding-bottom: 1%;
+              font-size: 14px;
+              margin-left: 1%;
+              width: 48%;
+              border-color: #CCC;
+              border-style: solid;
+              transition: 0.25s linear;
+       }
+
+       input:focus, select:focus{
+              width: 39%;
+              box-shadow: 0 0 5px #6495ED;
+       }
+
+       input[type=submit], input[type=reset], input[type=button]{
+              width: 23%;
+              background-color: #09C;
+              color: #FFF;
+              letter-spacing: 1px;
+              border-radius: 1px;
+              transition: all 0.2s linear;
+              margin-bottom: 20px;
+              border-color: #DDEEFF;
+              border-width: 1px;
+              border-style: solid;
+              font-family: "Comic Sans MS";
+
+       }
+
+       input[type=submit]:hover, input[type=reset]:hover, input[type=button]:hover{
+              background-color: #87CEFA;
+              color: #414A51;
+              box-shadow: 0 0 5px #6495ED;
+       }
+
+       input[type="number"]{
+              -moz-appearance: textfield;
+       }
+
+       input:invalid:not([type="submit"]) {
+              box-shadow: 0 0 5px #6495ED;
+              background: url(rouge3.png) right center no-repeat;
+              background-color:#FFFFFF;      
+       }
+
+       input:valid:not([type="submit"]) {
+              box-shadow: 0 0 5px #6495ED;
+              background: url(vert3.png) right center no-repeat ;
+              background-color: #FFFFFF;
+
+       }
+
+
+
+
+       
+
+
+header {
+       background:#09C;
+       height : 12%;
+       width: 100%;
+}
+
+       div.logo {
+              margin-left: 8%;
+       }
+
+       ul {
+              margin:0px ;
+              padding: 0px;
+              margin-left: 8%;
+              width: 100%;
+
+       }
+
+       li {
+              list-style-type: none;
+              color: #FFF;
+              font-family: "Comic Sans MS";
+              font-size: 14px;
+              font-weight: bold;
+       }
+
+       ul li a {
+              text-decoration: none;
+              color: inherit;
+       }
+
+
+       nav ul li:hover {
+                     color: #2D3E4A;
+       }
+
+       nav ul li:before {content:". "; color:#237DAC; margin:15px; font-size:20px; }
+
+
+       icone { 
+              margin-left: 9%; 
+       }
+
+      nav, ul, li, .logo, .icone{
+                            display: inline-block;
+                            vertical-align: middle;
+}
+
+}
+
+
+
+
+
+
+
+
