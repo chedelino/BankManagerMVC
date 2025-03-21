@@ -22,9 +22,8 @@ The application provides dedicated interfaces for Bank Agents, Client Advisors, 
 
 ## 📂 Project Structure
 
-```plaintext
 /banking-management-system
-│── 📜 a-propos.html        # About page  
+│── 📜 a-propos.html        <!-- # About page -->
 │── 👨‍💻 agent.php           # Employee management  
 │── 🌍 banque-en-ligne.html # Online banking page  
 │── 💳 comptes.html         # Account management  
@@ -40,7 +39,7 @@ The application provides dedicated interfaces for Bank Agents, Client Advisors, 
 │── 🎨 style1.css           # Additional styling file  
 │── 💲 tarifs.html          # Pricing page listing various service fees  
 │── 🏗️ banque.sql           # Full database schema including tables and relationships  
-```
+
 
 ## ⚙️ Technology Stack
   🎨 Frontend: HTML, CSS, JavaScript
