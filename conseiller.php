@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style1.css" />
+      <script src="fichier.js"></script>
+
 
     <title>Conseillers clients</title>
     
@@ -216,72 +218,117 @@ $conn->close();
             $id_conseiller = $_POST['id_du_conseiller'];
             $date = date('Y-m-d', strtotime($_POST['date111']));
 
-            // Vérifier si le conseiller existe dans la base de données
-        $sql_check_conseiller = "SELECT IdConseiller FROM Conseiller WHERE IdConseiller = ?";
-        $stmt_check = $conn->prepare($sql_check_conseiller);
-        $stmt_check->bind_param("i", $id_conseiller);
-        $stmt_check->execute();
-        $result_check = $stmt_check->get_result();
+    // Vérifier si le conseiller existe dans la base de données
+    $sql_check_conseiller = "SELECT IdConseiller, NomConseiller, PrenomConseiller FROM Conseiller WHERE IdConseiller = ?";
+    $stmt_check = $conn->prepare($sql_check_conseiller);
+    $stmt_check->bind_param("i", $id_conseiller);
+    $stmt_check->execute();
+    $result_check = $stmt_check->get_result();
 
-            if ($result_check->num_rows > 0) {
-                // Le conseiller existe, récupérer les rendez-vous
+    if ($result_check->num_rows > 0) {
+        // Récupérer les informations du conseiller
+        $conseiller = $result_check->fetch_assoc();
+        $nom_conseiller = $conseiller['NomConseiller'];
+        $prenom_conseiller = $conseiller['PrenomConseiller'];
 
-                 $sql = "SELECT * 
-                            FROM Rendezvous r
-                                LEFT JOIN Client c ON r.IdClient = c.IdClient
-                                LEFT JOIN Motif m ON r.IdMotif = m.IdMotif
-                                LEFT JOIN Conseiller co ON r.IdConseiller = co.IdConseiller OR c.IdConseiller = co.IdConseiller
-                                LEFT JOIN Employe e ON co.IdEmp = e.IdEmp
-                            WHERE e.Role = 'Conseiller' 
-                            AND co.IdConseiller = ? 
-                            AND r.DateRdv = ? 
-                            ORDER BY r.HeureRdv";
+        // Formater la date au format JJ/MM/YYYY
+        $date_formatee = date('d/m/Y', strtotime($date));
 
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("is", $id_conseiller, $date);
-                $stmt->execute();
-                $result = $stmt->get_result();
+        // Le conseiller existe, récupérer les rendez-vous
+$sql = "SELECT 
+    r.IdRdv, 
+    c.NomCl, 
+    c.PrenomCl, 
+    m.NomMotif, 
+    r.HeureRdv,
+    GROUP_CONCAT(p.NomPiece SEPARATOR ', ') AS Pieces
+        FROM Rendezvous r
+        LEFT JOIN Client c ON r.IdClient = c.IdClient
+        LEFT JOIN Motif m ON r.IdMotif = m.IdMotif
+        LEFT JOIN Requerir req ON m.IdMotif = req.IdMotif
+        LEFT JOIN Piece p ON req.IdPiece = p.IdPiece
+        LEFT JOIN Conseiller co ON r.IdConseiller = co.IdConseiller OR c.IdConseiller = co.IdConseiller
+        LEFT JOIN Employe e ON co.IdEmp = e.IdEmp
+        WHERE e.Role = 'Conseiller' 
+        AND co.IdConseiller = ? 
+        AND r.DateRdv = ? 
+        GROUP BY r.IdRdv
+        ORDER BY r.HeureRdv";
 
-                // Organiser les rendez-vous par heure
-                $planning = [];
-                if ($result->num_rows > 0) {
-                    while ($rdv = $result->fetch_assoc()) {
-                        $heure = date('H:i', strtotime($rdv['HeureRdv'])); // Assure un formatage correct de l'heure
-                        $planning[$heure] = $rdv['NomMotif'];
-                    }
-                }
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("is", $id_conseiller, $date);
+$stmt->execute();
+$result = $stmt->get_result();
 
-                // Définir les heures de travail
-                $heures = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
+// Collecte des données de rendez-vous
+$planning = [];
+$rdv_details = [];
 
-                // Afficher le planning
-                echo '<div class="calendar-container">'; 
-                echo '<table class="calendar">';
-                echo '<thead>';
-                echo '<tr>';
-                echo '<th>Heure</th>';
-                echo '<th>Planning</th>';
-                echo '</tr>';
-                echo '</thead>';
-                echo '<tbody id="calendar-body">';
-                foreach ($heures as $heure) {
-                    echo '<tr>';
-                    echo '<th>' . $heure . '</th>';
-                    if (isset($planning[$heure])) {
-                        echo '<td class="hour-slot occupied" data-date="' . $date . '" data-time="' . $heure . '">' . $planning[$heure] . '</td>';
-                    } else {
-                        echo '<td class="hour-slot free" data-date="' . $date . '" data-time="' . $heure . '" onclick="openModal(this)"></td>';
-                    }
-                    echo '</tr>';
-                }
-                echo '</tbody>';
-                echo '</table>';
-                echo '</div>'; 
+if ($result->num_rows > 0) {
+    while ($rdv = $result->fetch_assoc()) {
+        $heure = date('H:i', strtotime($rdv['HeureRdv']));
+        $planning[$heure] = $rdv['NomMotif'];
+        
+        // Stocker les détails complets pour chaque rendez-vous
+        $rdv_details[$heure] = [
+            'NomCl' => $rdv['NomCl'],
+            'PrenomCl' => $rdv['PrenomCl'],
+            'NomMotif' => $rdv['NomMotif'],
+            'Pieces' => $rdv['Pieces'],
+            'IdRdv' => $rdv['IdRdv']
+        ];
+    }
+}
+
+// Définir les heures de travail
+$heures = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
+
+// Afficher le planning
+echo '<div class="calendar-container">'; 
+echo '<table class="calendar">';
+echo '<thead>';
+echo '<tr>';
+echo '<th colspan="2">Planning de ' . $nom_conseiller . ' ' . $prenom_conseiller . ' : ' . $date_formatee . '</th>';
+echo '</tr>';
+echo '<tr>';
+echo '<th>Heure</th>';
+echo '<th>Planning</th>';
+echo '</tr>';
+echo '</thead>';
+echo '<tbody id="calendar-body">';
+foreach ($heures as $heure) {
+    echo '<tr>';
+    echo '<th>' . $heure . '</th>';
+    if (isset($planning[$heure])) {
+    echo '<td class="hour-slot occupied" data-date="' . $date . '" data-time="' . $heure . '" onclick="showModal(\'' . $heure . '\')">' . $planning[$heure] . '</td>';
+}else {
+        echo '<td class="hour-slot free" data-date="' . $date . '" data-time="' . $heure . '" onclick="openModal(this)"></td>';
+    }
+    echo '</tr>';
+}
+echo '</tbody>';
+echo '</table>';
+echo '</div>';
+
+
+echo '<div id="modal-synthese" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2 style="color: red;">Ce créneau est déjà occupé.</h2>
+         <br>
+        <h3>Synthèse du rendez-vous</h3>
+        <p><strong>Nom :</strong> <span id="modal-nom-client"></span></p>
+        <p><strong>Prénom :</strong> <span id="modal-prenom-client"></span></p>
+        <p><strong>Motif :</strong> <span id="modal-motif"></span></p>
+        <p><strong>Pièces :</strong> <span id="modal-pieces"></span></p>
+        <p><strong>ID Rendez-vous :</strong> <span id="modal-id-rdv"></span></p>
+    </div>
+</div>';
 
                 // Ajout du formulaire en modal
                 echo '<div id="modal" class="modal">
                         <div class="modal-content">
-                            <span class="close" onclick="closeModal()">&times;</span>
+                            <span class="close" onclick="closeModal1()">&times;</span>
                             <h2>Ajouter un rendez-vous</h2>
                             <form id="appointmentForm" method="POST">
                                 <input type="hidden" name="dateRdv" id="dateRdv">
@@ -313,7 +360,7 @@ $conn->close();
 
                     }
 
-                    function closeModal() {
+                    function closeModal1() {
                         document.getElementById("modal").style.display = "none";
                     }
                 </script>';
@@ -631,7 +678,7 @@ if (isset($_POST['newClientB']) && isset($_POST['identifiant']) && isset($_POST[
     <div class="form-group" style="display: flex; gap: 10px;">
         <div style="flex: 1;">
             <label>Numéro du Contrat</label>
-            <input type="number" id="numero_du_contrat" name="numero_du_contrat" required>
+            <input type="text" id="numero_du_contrat" name="numero_du_contrat" required>
         </div>
         <div style="flex: 1;">
             <label>Date de début</label>
@@ -654,7 +701,7 @@ if (isset($_POST['newClientB']) && isset($_POST['identifiant']) && isset($_POST[
 if (isset($_POST['ouverture_contrat_btn']) && isset($_POST['identif_du_client']) && isset($_POST['id_du_contrat_client'])) {
     $idClient = intval($_POST['identif_du_client']); 
     $idContrat = intval($_POST['id_du_contrat_client']); 
-    $numeroContrat = intval($_POST['numero_du_contrat']); 
+    $numeroContrat = $_POST['numero_du_contrat']; 
     $dateDebut = date('Y-m-d', strtotime($_POST['dateDebut']));
 
     $conn = new mysqli(SERVEUR, USER, PASSWORD, BDD);
@@ -664,7 +711,7 @@ if (isset($_POST['ouverture_contrat_btn']) && isset($_POST['identif_du_client'])
 
     $sql_update = "INSERT INTO Detenir (IdContrat, IdClient, NumeroContrat, DateDebut) VALUES(?,?,?,?)";
     $stmt_update = $conn->prepare($sql_update);
-    $stmt_update->bind_param("iiis", $idContrat, $idClient,$numeroContrat, $dateDebut);
+    $stmt_update->bind_param("iiss", $idContrat, $idClient,$numeroContrat, $dateDebut);
 
     if ($stmt_update->execute()) {
         echo '<div class="success-message" id="msgRdv"> Votre contrat a été créé avec succès ! </div>
@@ -895,18 +942,18 @@ if (isset($_POST['ouverture_compte_btn']) && isset($_POST['identi_du_client']) &
             <form id="modifierDecouvert" method="POST">
              <div class="form-group">
                     <label>Identifiant du client </label>
-                    <input type="text" id="id_du_client" name="id_du_client" required>
+                    <input type="number" id="id_du_client" name="id_du_client" required>
              </div>
 
             <div class="form-group">
-                    <label>Identifiant du Compte </label>
-                    <input type="text" id="id_du_compte" name="id_du_compte" required>
+                    <label>Numéro du Compte </label>
+                    <input type="number" id="id_du_compte" name="id_du_compte" required>
              </div>
 
 
                 <div class="form-group">
                     <label> Valeur du découvert (€) </label>
-                    <input type="text" id="valeurDecouvert" name="valeurDecouvert"  required>
+                    <input type="number" id="valeurDecouvert" name="valeurDecouvert"  required>
                 </div>
                 <button class="btn-secondary" type="reset" name="Effacer_btn" id="Effacer_btn">Effacer</button>
                 <button class="btn-primary" type="submit" id="modifier_btn_decouv" name="modifier_btn_decouv">Modifier</button>
@@ -928,8 +975,8 @@ if (isset($_POST['modifier_btn_decouv']) && isset($_POST['id_du_client']) && iss
         die("Échec de la connexion : " . $conn->connect_error);
     }
 
-    // Vérifier si l'idClient et l'idCompte existent et correspondent
-    $sql_check = "SELECT COUNT(*) AS count FROM Appartenir WHERE idCompte = ? AND idClient = ?";
+    // Vérifier si l'idClient et le NumeroCompte existent et correspondent
+    $sql_check = "SELECT COUNT(*) AS count FROM Appartenir WHERE NumeroCompte = ? AND idClient = ?";
     $stmt_check = $conn->prepare($sql_check);
     $stmt_check->bind_param("ii", $idCompte, $idClient);
     $stmt_check->execute();
@@ -950,7 +997,7 @@ if (isset($_POST['modifier_btn_decouv']) && isset($_POST['id_du_client']) && iss
     // Si la vérification est réussie, procéder à la mise à jour
     
     else{
-    $sql_update = "UPDATE Appartenir SET MontantDec = ? WHERE idCompte = ? AND idClient = ?";
+    $sql_update = "UPDATE Appartenir SET MontantDec = ? WHERE NumeroCompte = ? AND idClient = ?";
     $stmt_update = $conn->prepare($sql_update);
     $stmt_update->bind_param("iii", $decouvert, $idCompte, $idClient); 
 
@@ -985,12 +1032,12 @@ if (isset($_POST['modifier_btn_decouv']) && isset($_POST['id_du_client']) && iss
             <form id="ResilierForm" method="POST">
              <div class="form-group">
                     <label>Identifiant du client </label>
-                    <input type="text" id="id_du_client_contrat" name="id_du_client_contrat" required>
+                    <input type="number" id="id_du_client_contrat" name="id_du_client_contrat" required>
              </div>
 
 
                 <div class="form-group">
-                    <label>ID du contrat </label>
+                    <label>Numéro du contrat </label>
                     <input type="text" id="id_du_contrat_client" name="id_du_contrat_client"  required>
                 </div>
 
@@ -1019,9 +1066,9 @@ if (isset($_POST['resilier_btn_contrat']) && isset($_POST['id_du_client_contrat'
     }
 
     // Vérifier si l'idClient et l'idCompte existent et correspondent
-    $sql_check = "SELECT COUNT(*) AS count FROM Detenir WHERE IdContrat = ? AND IdClient = ?";
+    $sql_check = "SELECT COUNT(*) AS count FROM Detenir WHERE NumeroContrat = ? AND IdClient = ?";
     $stmt_check = $conn->prepare($sql_check);
-    $stmt_check->bind_param("ii", $idContrat, $idClient);
+    $stmt_check->bind_param("si", $idContrat, $idClient);
     $stmt_check->execute();
     $result_check = $stmt_check->get_result();
     $row_check = $result_check->fetch_assoc();
@@ -1040,9 +1087,9 @@ if (isset($_POST['resilier_btn_contrat']) && isset($_POST['id_du_client_contrat'
     // Si la vérification est réussie, procéder à la Suppression
     
     else{
-    $sql_update = "DELETE FROM Detenir WHERE IdContrat = ? AND IdClient = ?";
+    $sql_update = "DELETE FROM Detenir WHERE NumeroContrat = ? AND IdClient = ?";
     $stmt_update = $conn->prepare($sql_update);
-    $stmt_update->bind_param("ii", $idContrat, $idClient);
+    $stmt_update->bind_param("si", $idContrat, $idClient);
 
     if ($stmt_update->execute()) {
         echo '<div class="success-message" id="msgRdv"> Contrat résilié avec succès ! </div>
@@ -1074,11 +1121,11 @@ if (isset($_POST['resilier_btn_contrat']) && isset($_POST['id_du_client_contrat'
             <form id="ResilierForm" method="POST">
              <div class="form-group">
                     <label>Identifiant du client </label>
-                    <input type="text" id="id_du_client_compte" name="id_du_client_compte" required>
+                    <input type="number" id="id_du_client_compte" name="id_du_client_compte" required>
              </div>
 
                 <div class="form-group">
-                    <label>ID du compte </label>
+                    <label>Numéro du compte </label>
                     <input type="text" id="id_du_compte_client" name="id_du_compte_client"  required>
                 </div>
 
@@ -1106,7 +1153,7 @@ if (isset($_POST['resilier_btn_compte']) && isset($_POST['id_du_client_compte'])
     }
 
     // Vérifier si l'idClient et l'idCompte existent et correspondent
-    $sql_check = "SELECT COUNT(*) AS count FROM Appartenir WHERE idCompte = ? AND idClient = ?";
+    $sql_check = "SELECT COUNT(*) AS count FROM Appartenir WHERE NumeroCompte = ? AND idClient = ?";
     $stmt_check = $conn->prepare($sql_check);
     $stmt_check->bind_param("ii", $idCompte, $idClient);
     $stmt_check->execute();
@@ -1127,7 +1174,7 @@ if (isset($_POST['resilier_btn_compte']) && isset($_POST['id_du_client_compte'])
     // Si la vérification est réussie, procéder à la Suppression
     
     else{
-    $sql_update = "DELETE FROM Appartenir WHERE IdCompte = ? AND IdClient = ?";
+    $sql_update = "DELETE FROM Appartenir WHERE NumeroCompte = ? AND IdClient = ?";
     $stmt_update = $conn->prepare($sql_update);
     $stmt_update->bind_param("ii", $idCompte, $idClient);
 
@@ -1155,47 +1202,41 @@ if (isset($_POST['resilier_btn_compte']) && isset($_POST['id_du_client_compte'])
 
 
 <script>
-        // Fonction pour ouvrir un onglet
-        function openTab(evt, tabName) {
-            const tabContents = document.getElementsByClassName("tab-content");
-            for (let content of tabContents) {
-                content.classList.remove("active");
-            }
 
-            const tabs = document.getElementsByClassName("tab");
-            for (let tab of tabs) {
-                tab.classList.remove("active");
-            }
+    // Données des rendez-vous (récupérées via PHP)
+    const rdvDetails = <?php echo json_encode($rdv_details); ?>;
 
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-            
-            // Sauvegarder l'onglet actif dans localStorage
-            localStorage.setItem('activeTab', tabName);
-        }
+    // Fonction pour afficher la modale
+    function showModal(heure) {
+        // Récupérer les détails du rendez-vous
+        const details = rdvDetails[heure];
 
-        // Fonction pour restaurer l'onglet actif au chargement de la page
-        function restoreActiveTab() {
-            const activeTab = localStorage.getItem('activeTab');
-            if (activeTab) {
-                // Simuler un clic sur l'onglet
-                const tabButton = document.querySelector(`button.tab[onclick="openTab(event, '${activeTab}')"]`);
-                if (tabButton) {
-                    // Créer un événement factice
-                    const evt = { currentTarget: tabButton };
-                    openTab(evt, activeTab);
-                }
-            }
-        }
+        // Mettre à jour le contenu de la modale
+        document.getElementById('modal-nom-client').textContent = details.NomCl;
+        document.getElementById('modal-prenom-client').textContent = details.PrenomCl;
+        document.getElementById('modal-motif').textContent = details.NomMotif;
+    document.getElementById('modal-pieces').textContent = details.Pieces; // Afficher les pièces
+        document.getElementById('modal-id-rdv').textContent = details.IdRdv;
 
-     // Fonction pour la déconnexion
-    function logout() {
-        window.location.href = "site.php"; // Redirection vers la page d'accueil
+        // Afficher la modale
+        document.getElementById('modal-synthese').style.display = 'block';
     }
 
-        // Ajouter l'écouteur d'événement pour le chargement de la page
-        window.addEventListener('load', restoreActiveTab);
-    </script>
+    // Fonction pour fermer la modale
+    function closeModal() {
+        document.getElementById('modal-synthese').style.display = 'none';
+    }
+
+    // Fermer la modale si l'utilisateur clique en dehors de celle-ci
+    window.onclick = function(event) {
+        const modal = document.getElementById('modal-synthese');
+        if (event.target === modal) {
+            closeModal();
+        }
+    };
+
+   
+ </script>
 
 
 

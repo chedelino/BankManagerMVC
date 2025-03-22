@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <link rel="stylesheet" href="style1.css" />
+     <script src="fichier.js"></script>
+
 
     <title>Agent d'accueil</title>   
 
@@ -302,7 +304,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Requête pour récupérer les informations des comptes du client
-        $sql_comptes = "SELECT IdClient, NumeroCompte, TypeCompte, DateOuverture, Solde, MontantDec
+        $sql_comptes = "SELECT IdClient,Compte.IdCompte, NumeroCompte, TypeCompte, DateOuverture, Solde, MontantDec
                         FROM Compte
                         INNER JOIN Appartenir ON Compte.IdCompte = Appartenir.IdCompte
                         WHERE IdClient = ?";
@@ -319,6 +321,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <tr>
                         <th>ID Client</th>
                         <th>Numéro de compte</th>
+                         <th>Identifiant de compte</th>
                         <th>Type de compte</th>
                         <th>Date d\'ouverture</th>
                         <th>Solde</th>
@@ -329,6 +332,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo '<tr>
                         <td>' . ($row['IdClient']) . '</td>
                         <td>' . ($row['NumeroCompte']) . '</td>
+                        <td>' . ($row['IdCompte']) . '</td>
                         <td>' . ($row['TypeCompte']) . '</td>
                         <td>' . ($row['DateOuverture']) . '</td>
                         <td>' . ($row['Solde']) . '</td>
@@ -704,65 +708,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Échec de la connexion : " . $conn->connect_error);
     }
 
-
-
-
-
-
-// Récupérer les rendez-vous pour une semaine donnée
-if (isset($_POST['id_du_cli']) && isset($_POST['envoyerPlanning']) && isset($_POST['semaine1'])) {
-    $id_charge_client = $_POST['id_du_cli'];
-
-    $date_entree = date('Y-m-d', strtotime($_POST['semaine1']));
-
-    $date_debut = date('Y-m-d', strtotime('monday this week', strtotime($date_entree)));
-
-    $date_fin = date('Y-m-d', strtotime('friday this week', strtotime($date_entree)));
-
-
-     // Vérifier si le conseiller existe dans la base de données
-        $sql_check_conseiller = "SELECT IdConseiller FROM Conseiller WHERE IdConseiller = ?";
-        $stmt_check = $conn->prepare($sql_check_conseiller);
-        $stmt_check->bind_param("i", $id_charge_client);
-        $stmt_check->execute();
-        $result_check = $stmt_check->get_result();
-
-
-        if ($result_check->num_rows > 0) {
-
-                 $sql = "SELECT * 
-                            FROM Rendezvous r
-                                LEFT JOIN Client c ON r.IdClient = c.IdClient
-                                LEFT JOIN Motif m ON r.IdMotif = m.IdMotif
-                                LEFT JOIN Conseiller co ON r.IdConseiller = co.IdConseiller OR c.IdConseiller = co.IdConseiller
-                                LEFT JOIN Employe e ON co.IdEmp = e.IdEmp
-                            WHERE e.Role = 'Conseiller' 
-                            AND co.IdConseiller = ? 
-                            AND r.DateRdv BETWEEN ? AND ? 
-                            ORDER BY r.DateRdv, r.HeureRdv";
-
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("iss", $id_charge_client, $date_debut, $date_fin);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    $rendezvous = [];
-    while ($rdv = $result->fetch_assoc()) {
-        $rendezvous[] = $rdv;
-    }
-
-    // Organiser les rendez-vous par jour et par heure
-    $planning = [];
-    foreach ($rendezvous as $rdv) {
-        $jour = date('N', strtotime($rdv['DateRdv'])); // 1 (Lundi) à 7 (Dimanche)
-        $heure = date('H:i', strtotime($rdv['HeureRdv'])); // Assure un formatage correct de l'heure
-        $planning[$jour][$heure] = $rdv['NomMotif'];
-    }
-
-    // Définir les jours de la semaine et les heures de travail
-    $jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
-    $heures = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
-
     echo '<style>
     .calendar-container {
         display: flex;
@@ -822,46 +767,128 @@ if (isset($_POST['id_du_cli']) && isset($_POST['envoyerPlanning']) && isset($_PO
         background-color: #fadbd8;
     }
 
-            .modal {
-                display: none;
-                position: fixed;
-                z-index: 1;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                overflow: auto;
-                background-color: rgba(0,0,0,0.5);
-            }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+    }
 
-            .modal-content {
-                background-color: #fefefe;
-                margin: 15% auto;
-                padding: 20px;
-                border: 1px solid #888;
-                width: 80%;
-                max-width: 500px;
-                border-radius: 10px;
-            }
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 10px;
+    }
 
-            .close {
-                color: #aaa;
-                float: right;
-                font-size: 28px;
-                font-weight: bold;
-            }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
 
-            .close:hover,
-            .close:focus {
-                color: black;
-                text-decoration: none;
-                cursor: pointer;
-            }    
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }    
     </style>';
 
+
+// Récupérer les rendez-vous pour une semaine donnée
+if (isset($_POST['id_du_cli']) && isset($_POST['envoyerPlanning']) && isset($_POST['semaine1'])) {
+    $id_charge_client = $_POST['id_du_cli'];
+
+    $date_entree = date('Y-m-d', strtotime($_POST['semaine1']));
+
+    $date_debut = date('Y-m-d', strtotime('monday this week', strtotime($date_entree)));
+
+    $date_fin = date('Y-m-d', strtotime('friday this week', strtotime($date_entree)));
+
+
+     // Vérifier si le conseiller existe dans la base de données
+$sql_check_conseiller = "SELECT IdConseiller, NomConseiller, PrenomConseiller FROM Conseiller WHERE IdConseiller = ?";
+$stmt_check = $conn->prepare($sql_check_conseiller);
+$stmt_check->bind_param("i", $id_charge_client);
+$stmt_check->execute();
+$result_check = $stmt_check->get_result();
+
+if ($result_check->num_rows > 0) {
+    // Récupérer les informations du conseiller
+    $conseiller = $result_check->fetch_assoc();
+    $nom_conseiller = $conseiller['NomConseiller'];
+    $prenom_conseiller = $conseiller['PrenomConseiller'];
+
+    // Formater les dates de début et de fin au format JJ/MM/YYYY
+    $date_debut_formatee = date('d/m/Y', strtotime($date_debut));
+    $date_fin_formatee = date('d/m/Y', strtotime($date_fin));
+
+    // Récupérer les rendez-vous
+$sql = "SELECT 
+    r.IdRdv, 
+    c.NomCl, 
+    c.PrenomCl, 
+    m.NomMotif, 
+    r.HeureRdv,
+    r.DateRdv,
+    GROUP_CONCAT(p.NomPiece SEPARATOR ', ') AS Pieces
+        FROM Rendezvous r
+        LEFT JOIN Client c ON r.IdClient = c.IdClient
+        LEFT JOIN Motif m ON r.IdMotif = m.IdMotif
+        LEFT JOIN Requerir req ON m.IdMotif = req.IdMotif
+        LEFT JOIN Piece p ON req.IdPiece = p.IdPiece
+        LEFT JOIN Conseiller co ON r.IdConseiller = co.IdConseiller OR c.IdConseiller = co.IdConseiller
+        LEFT JOIN Employe e ON co.IdEmp = e.IdEmp
+        WHERE e.Role = 'Conseiller' 
+        AND co.IdConseiller = ? 
+        AND r.DateRdv BETWEEN ? AND ? 
+        GROUP BY r.IdRdv
+        ORDER BY r.DateRdv, r.HeureRdv";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iss", $id_charge_client, $date_debut, $date_fin);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+$rendezvous = [];
+$rdv_details = [];
+
+while ($rdv = $result->fetch_assoc()) {
+    $jour = date('N', strtotime($rdv['DateRdv'])); // 1 (Lundi) à 7 (Dimanche)
+    $heure = date('H:i', strtotime($rdv['HeureRdv'])); // Assure un formatage correct de l'heure
+    $planning[$jour][$heure] = $rdv['NomMotif'];
+    
+    // Stocker les détails complets pour chaque rendez-vous
+    $rdv_details[$jour][$heure] = [
+        'NomCl' => $rdv['NomCl'],
+        'PrenomCl' => $rdv['PrenomCl'],
+        'NomMotif' => $rdv['NomMotif'],
+        'Pieces' => $rdv['Pieces'],
+        'IdRdv' => $rdv['IdRdv']
+    ];
+}
+
+    // Définir les jours de la semaine et les heures de travail
+    $jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+    $heures = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
+
+    // Afficher le planning
     echo '<div class="calendar-container">'; 
     echo '<table class="calendar">';
     echo '<thead>';
+    echo '<tr>';
+    echo '<th colspan="6"> Planning de ' . $nom_conseiller . ' ' . $prenom_conseiller . ' : ' . $date_debut_formatee . ' au ' . $date_fin_formatee . '</th>';
+    echo '</tr>';
     echo '<tr>';
     echo '<th>Heure</th>';
     foreach ($jours as $jour) {
@@ -874,20 +901,40 @@ if (isset($_POST['id_du_cli']) && isset($_POST['envoyerPlanning']) && isset($_PO
         echo '<tr>';
         echo '<th>' . $heure . '</th>';
 
-    for ($i = 1; $i <= 5; $i++) { // 1 = Lundi, 5 = Vendredi
-    $date_rdv = date('Y-m-d', strtotime($date_debut . " + " . ($i - 1) . " days"));
-    
-    if (isset($planning[$i][$heure])) {
-        echo '<td class="hour-slot occupied" data-date="' . $date_rdv . '" data-time="' . $heure . '">' . ($planning[$i][$heure]) . '</td>';
-    } else {
-        echo '<td class="hour-slot free" data-date="' . $date_rdv . '" data-time="' . $heure . '" onclick="openModal(this)"></td>';
-    }
-}
+        for ($i = 1; $i <= 5; $i++) { // 1 = Lundi, 5 = Vendredi
+            $date_rdv = date('Y-m-d', strtotime($date_debut . " + " . ($i - 1) . " days"));
+
+            if (isset($planning[$i][$heure])) {
+  echo '<td class="hour-slot occupied" data-date="' . $date_rdv . '" data-time="' . $heure . '" onclick="showModal(\'' . $i . '\', \'' . $heure . '\')">' . ($planning[$i][$heure]) . '</td>';} else {
+                echo '<td class="hour-slot free" data-date="' . $date_rdv . '" data-time="' . $heure . '" onclick="openModal(this)"></td>';
+            }
+        }
         echo '</tr>';
     }
     echo '</tbody>';
     echo '</table>';
-    echo '</div>'; 
+    echo '</div>';
+
+
+
+
+echo'<div id="modal-synthese" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2 style="color: red;">Ce créneau est déjà occupé.</h2>
+         <br>
+        <h3>Synthèse du rendez-vous</h3>
+        <p><strong>Nom :</strong> <span id="modal-nom-client"></span></p>
+        <p><strong>Prénom :</strong> <span id="modal-prenom-client"></span></p>
+        <p><strong>Motif :</strong> <span id="modal-motif"></span></p>
+        <p><strong>Pièces :</strong> <span id="modal-pieces"></span></p>
+        <p><strong>ID Rendez-vous :</strong> <span id="modal-id-rdv"></span></p>
+    </div>
+</div>';
+
+
+
+
 
 
 
@@ -895,7 +942,7 @@ if (isset($_POST['id_du_cli']) && isset($_POST['envoyerPlanning']) && isset($_PO
 echo '
 <div id="modal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
+        <span class="close" onclick="closeModal1()">&times;</span>
         <h2>Ajouter un rendez-vous</h2>
         <form id="appointmentForm" method="POST">
             <input type="hidden" name="dateRdv" id="dateRdv">
@@ -948,7 +995,7 @@ echo '
         document.getElementById("HeureRv").value = element.getAttribute("data-time");
     }
 
-    function closeModal() {
+    function closeModal1() {
         document.getElementById("modal").style.display = "none";
     }
 </script>';
@@ -1212,47 +1259,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 <script>
-        // Fonction pour ouvrir un onglet
-        function openTab(evt, tabName) {
-            const tabContents = document.getElementsByClassName("tab-content");
-            for (let content of tabContents) {
-                content.classList.remove("active");
-            }
 
-            const tabs = document.getElementsByClassName("tab");
-            for (let tab of tabs) {
-                tab.classList.remove("active");
-            }
+// Données des rendez-vous (récupérées via PHP)
+const rdvDetails = <?php echo json_encode($rdv_details); ?>;
 
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-            
-            // Sauvegarder l'onglet actif dans localStorage
-            localStorage.setItem('activeTab', tabName);
-        }
+// Fonction pour afficher la modale
+function showModal(jour, heure) {
+    // Récupérer les détails du rendez-vous
+    const details = rdvDetails[jour][heure];
 
-        // Fonction pour restaurer l'onglet actif au chargement de la page
-        function restoreActiveTab() {
-            const activeTab = localStorage.getItem('activeTab');
-            if (activeTab) {
-                // Simuler un clic sur l'onglet
-                const tabButton = document.querySelector(`button.tab[onclick="openTab(event, '${activeTab}')"]`);
-                if (tabButton) {
-                    // Créer un événement factice
-                    const evt = { currentTarget: tabButton };
-                    openTab(evt, activeTab);
-                }
-            }
-        }
+    // Mettre à jour le contenu de la modale
+    document.getElementById('modal-nom-client').textContent = details.NomCl;
+    document.getElementById('modal-prenom-client').textContent = details.PrenomCl;
+    document.getElementById('modal-motif').textContent = details.NomMotif;
+    document.getElementById('modal-pieces').textContent = details.Pieces; // Afficher les pièces
+    document.getElementById('modal-id-rdv').textContent = details.IdRdv;
 
-    // Fonction pour la déconnexion
-    function logout() {
-        window.location.href = "site.php"; // Redirection vers la page d'accueil
-    }
+    // Afficher la modale
+    document.getElementById('modal-synthese').style.display = 'block';
+}
 
-        // Ajouter l'écouteur d'événement pour le chargement de la page
-        window.addEventListener('load', restoreActiveTab);
-    </script>
+// Fonction pour fermer la modale
+function closeModal() {
+    document.getElementById('modal-synthese').style.display = 'none';
+}
+
+</script>
 
 
 
